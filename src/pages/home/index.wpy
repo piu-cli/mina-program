@@ -1,0 +1,83 @@
+<template>
+  <view class="home-wrapper">
+    我是首页
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy'
+import { imageUrl } from '@/config'
+import { logIn, refreshUserInfo, Tip } from '@/utils'
+export default class Home extends wepy.page {
+  config = {
+    navigationBarTitleText: '示例',
+    navigationBarBackgroundColor: '#AFD4C6',
+    navigationBarTextStyle: 'black'
+  }
+  components = {}
+  data = {
+    imageUrl
+  }
+  computed = {}
+  watch = {}
+  mixins = []
+  methods = {}
+  events = {}
+  onLoad(option) {
+    this.option = option
+    this.init(option)
+  }
+  onShow() {}
+  onUnload() {}
+  // ==========  自定义函数必须写在这个之后  =====================================
+  async init() {
+    try {
+      const { needUpdate } = await logIn(true)
+      if (needUpdate) {
+        this.doAuth()
+      } else {
+        this.pageInit()
+      }
+    } catch (error) {
+      Tip.error('服务器异常，请稍后再试')
+    }
+  }
+  async doAuth() {
+    await refreshUserInfo()
+  }
+
+  pageInit() {
+    const { needJump, redirectUrl } = this.option
+    if (needJump) {
+      this.jumpTo(redirectUrl)
+    } else {
+      this.getPageData()
+    }
+  }
+
+  /**
+   * 跳转到指定的页面
+   * @argument {String} url 指定的页面地址
+   */
+  jumpTo(url) {
+    url = decodeURIComponent(url)
+    wepy.navigateTo({
+      url
+    })
+  }
+
+  /**
+   * 请求页面数据
+   */
+  getPageData() {
+  }
+}
+</script>
+
+<style lang='stylus'>
+.home-wrapper {
+  width: 100%;
+  height: 100%;
+  display: flex;
+}
+</style>
